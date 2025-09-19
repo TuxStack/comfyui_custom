@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  comfyui:
+    image: ghcr.io/tuxstack/comfyui_custom:latest
+    ports:
+      - "8188:8188"
+    volumes:
+      # Prefer bind mounts you can manage on the host:
+      - /opt/comfyui/models:/root/comfyui/models
+      - /opt/comfyui/outputs:/root/comfyui/outputs
+      - /opt/comfyui/input:/root/comfyui/input
+      - /opt/comfyui/custom_nodes:/root/comfyui/custom_nodes
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+          - node.labels.comfyui == true
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: ["gpu"]
+      restart_policy:
+        condition: on-failure
+      update_config:
+        order: start-first
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8188/api/version || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
