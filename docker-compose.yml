@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   comfyui:
-    image: ghcr.io/<you>/<comfyui-image>:latest
+    image: ghcr.io/tuxstack/comfyui_custom:latest
     ports:
       - "8188:8188"
     environment:
